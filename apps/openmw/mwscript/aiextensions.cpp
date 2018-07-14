@@ -297,6 +297,25 @@ namespace MWScript
                     MWMechanics::Stat<int> stat = ptr.getClass().getCreatureStats(ptr).getAiSetting(setting);
                     stat.setModified(value, 0);
                     ptr.getClass().getCreatureStats(ptr).setAiSetting(setting, stat);
+
+                    /*
+                        Start of tes3mp addition
+
+                        Setting an actor's AI_Fight to 100 is equivalent to starting combat with the local player,
+                        so send a combat packet regardless of whether we're the cell authority or not; the server
+                        can decide if it wants to comply with them by forwarding them to the cell authority
+                    */
+                    if (setting == MWMechanics::CreatureStats::AI_Fight && value == 100)
+                    {
+                        mwmp::ActorList *actorList = mwmp::Main::get().getNetworking()->getActorList();
+                        actorList->reset();
+                        actorList->cell = *ptr.getCell()->getCell();
+                        actorList->addAiActor(ptr, MWBase::Environment::get().getWorld()->getPlayerPtr(), mwmp::BaseActorList::COMBAT);
+                        actorList->sendAiActors();
+                    }
+                    /*
+                        End of tes3mp addition
+                    */
                 }
         };
 
@@ -336,38 +355,18 @@ namespace MWScript
                     /*
                         Start of tes3mp addition
 
-                        Send ActorAI packets when an actor follows us, regardless of whether we're the cell
-                        authority or not; the server can decide if it wants to comply with them by forwarding
-                        them to the cell authority
+                        Send ActorAI packets when an actor becomes a follower, regardless of whether we're
+                        the cell authority or not; the server can decide if it wants to comply with them by
+                        forwarding them to the cell authority
                     */
                     MWWorld::Ptr targetPtr = MWBase::Environment::get().getWorld()->searchPtr(actorID, true);
 
                     if (targetPtr)
                     {
-                        mwmp::BaseActor baseActor;
-                        baseActor.refNum = ptr.getCellRef().getRefNum().mIndex;
-                        baseActor.mpNum = ptr.getCellRef().getMpNum();
-                        baseActor.aiAction = mwmp::BaseActorList::FOLLOW;
-                        baseActor.aiTarget = MechanicsHelper::getTarget(targetPtr);
-
-                        LOG_MESSAGE_SIMPLE(Log::LOG_INFO, "Sending ID_ACTOR_AI about %s %i-%i to server",
-                            ptr.getCellRef().getRefId(), baseActor.refNum, baseActor.mpNum);
-
-                        if (baseActor.aiTarget.isPlayer)
-                        {
-                            LOG_MESSAGE_SIMPLE(Log::LOG_INFO, "- Following player %s",
-                                targetPtr.getClass().getName(targetPtr).c_str());
-                        }
-                        else
-                        {
-                            LOG_MESSAGE_SIMPLE(Log::LOG_INFO, "- Following actor %s %i-%i",
-                                targetPtr.getCellRef().getRefId(), baseActor.aiTarget.refNum, baseActor.aiTarget.mpNum);
-                        }
-
                         mwmp::ActorList *actorList = mwmp::Main::get().getNetworking()->getActorList();
                         actorList->reset();
                         actorList->cell = *ptr.getCell()->getCell();
-                        actorList->addAiActor(baseActor);
+                        actorList->addAiActor(ptr, targetPtr, mwmp::BaseActorList::FOLLOW);
                         actorList->sendAiActors();
                     }
                     /*
@@ -507,6 +506,25 @@ namespace MWScript
 
                     MWWorld::Ptr target = MWBase::Environment::get().getWorld()->getPtr(targetID, true);
                     MWBase::Environment::get().getMechanicsManager()->startCombat(actor, target);
+
+                    /*
+                        Start of tes3mp addition
+
+                        Send ActorAI packets when an actor starts combat, regardless of whether we're the
+                        cell authority or not; the server can decide if it wants to comply with them by
+                        forwarding them to the cell authority
+                    */
+                    if (target)
+                    {
+                        mwmp::ActorList *actorList = mwmp::Main::get().getNetworking()->getActorList();
+                        actorList->reset();
+                        actorList->cell = *actor.getCell()->getCell();
+                        actorList->addAiActor(actor, target, mwmp::BaseActorList::COMBAT);
+                        actorList->sendAiActors();
+                    }
+                    /*
+                        End of tes3mp addition
+                    */
                 }
         };
 
