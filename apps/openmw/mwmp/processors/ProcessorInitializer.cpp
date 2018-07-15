@@ -5,7 +5,6 @@
 #include "player/ProcessorGUIMessageBox.hpp"
 #include "player/ProcessorHandshake.hpp"
 #include "player/ProcessorUserDisconnected.hpp"
-#include "player/ProcessorCellCreate.hpp"
 #include "player/ProcessorGameSettings.hpp"
 #include "player/ProcessorGameWeather.hpp"
 #include "player/ProcessorPlayerAnimFlags.hpp"
@@ -24,7 +23,7 @@
 #include "player/ProcessorPlayerDisposition.hpp"
 #include "player/ProcessorPlayerEquipment.hpp"
 #include "player/ProcessorPlayerFaction.hpp"
-#include "player/ProcessorPlayerInteraction.hpp"
+#include "player/ProcessorPlayerInput.hpp"
 #include "player/ProcessorPlayerInventory.hpp"
 #include "player/ProcessorPlayerJail.hpp"
 #include "player/ProcessorPlayerJournal.hpp"
@@ -51,6 +50,7 @@
 #include "object/ProcessorDoorDestination.hpp"
 #include "object/ProcessorDoorState.hpp"
 #include "object/ProcessorMusicPlay.hpp"
+#include "object/ProcessorObjectActivate.hpp"
 #include "object/ProcessorObjectAnimPlay.hpp"
 #include "object/ProcessorObjectAttach.hpp"
 #include "object/ProcessorObjectCollision.hpp"
@@ -89,6 +89,8 @@
 #include "actor/ProcessorActorTest.hpp"
 
 #include "WorldstateProcessor.hpp"
+#include "worldstate/ProcessorCellCreate.hpp"
+#include "worldstate/ProcessorCellReplace.hpp"
 #include "worldstate/ProcessorRecordDynamic.hpp"
 #include "worldstate/ProcessorWorldCollisionOverride.hpp"
 #include "worldstate/ProcessorWorldMap.hpp"
@@ -102,7 +104,6 @@ void ProcessorInitializer()
     PlayerProcessor::AddProcessor(new ProcessorGUIMessageBox());
     PlayerProcessor::AddProcessor(new ProcessorHandshake());
     PlayerProcessor::AddProcessor(new ProcessorUserDisconnected());
-    PlayerProcessor::AddProcessor(new ProcessorCellCreate());
     PlayerProcessor::AddProcessor(new ProcessorGameSettings());
     PlayerProcessor::AddProcessor(new ProcessorGameWeather());
     PlayerProcessor::AddProcessor(new ProcessorPlayerAnimFlags());
@@ -121,7 +122,7 @@ void ProcessorInitializer()
     PlayerProcessor::AddProcessor(new ProcessorPlayerDisposition());
     PlayerProcessor::AddProcessor(new ProcessorPlayerEquipment());
     PlayerProcessor::AddProcessor(new ProcessorPlayerFaction());
-    PlayerProcessor::AddProcessor(new ProcessorPlayerInteraction());
+    PlayerProcessor::AddProcessor(new ProcessorPlayerInput());
     PlayerProcessor::AddProcessor(new ProcessorPlayerInventory());
     PlayerProcessor::AddProcessor(new ProcessorPlayerJail());
     PlayerProcessor::AddProcessor(new ProcessorPlayerJournal());
@@ -147,6 +148,7 @@ void ProcessorInitializer()
     ObjectProcessor::AddProcessor(new ProcessorDoorDestination());
     ObjectProcessor::AddProcessor(new ProcessorDoorState());
     ObjectProcessor::AddProcessor(new ProcessorMusicPlay());
+    ObjectProcessor::AddProcessor(new ProcessorObjectActivate());
     ObjectProcessor::AddProcessor(new ProcessorObjectAnimPlay());
     ObjectProcessor::AddProcessor(new ProcessorObjectAttach());
     ObjectProcessor::AddProcessor(new ProcessorObjectCollision());
@@ -183,6 +185,8 @@ void ProcessorInitializer()
     ActorProcessor::AddProcessor(new ProcessorActorStatsDynamic());
     ActorProcessor::AddProcessor(new ProcessorActorTest());
 
+    WorldstateProcessor::AddProcessor(new ProcessorCellCreate());
+    WorldstateProcessor::AddProcessor(new ProcessorCellReplace());
     WorldstateProcessor::AddProcessor(new ProcessorRecordDynamic());
     WorldstateProcessor::AddProcessor(new ProcessorWorldCollisionOverride());
     WorldstateProcessor::AddProcessor(new ProcessorWorldMap());

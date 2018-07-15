@@ -178,12 +178,10 @@ add_component_dir (openmw-mp/Packets/Player
 
         PacketHandshake PacketChatMessage PacketGUIBoxes PacketGameSettings PacketGameWeather
 
-        PacketCellCreate
-
         PacketPlayerBaseInfo PacketPlayerCharGen PacketPlayerActiveSkills PacketPlayerAnimFlags PacketPlayerAnimPlay
         PacketPlayerAttack PacketPlayerAttribute PacketPlayerBehavior PacketPlayerBook PacketPlayerBounty
         PacketPlayerCellChange PacketPlayerCellState PacketPlayerClass PacketPlayerDeath PacketPlayerEquipment
-        PacketPlayerFaction PacketPlayerInteraction PacketPlayerInventory PacketPlayerJail PacketPlayerJournal
+        PacketPlayerFaction PacketPlayerInput PacketPlayerInventory PacketPlayerJail PacketPlayerJournal
         PacketPlayerKillCount PacketPlayerLevel PacketPlayerMiscellaneous PacketPlayerMomentum PacketPlayerPosition
         PacketPlayerQuickKeys PacketPlayerRegionAuthority PacketPlayerReputation PacketPlayerRest PacketPlayerResurrect
         PacketPlayerShapeshift PacketPlayerSkill PacketPlayerSpeech PacketPlayerSpellbook PacketPlayerStatsDynamic
@@ -193,28 +191,24 @@ add_component_dir (openmw-mp/Packets/Player
 add_component_dir (openmw-mp/Packets/Object
         ObjectPacket
 
-        PacketConsoleCommand PacketContainer PacketObjectAnimPlay PacketObjectAttach PacketObjectCollision
-        PacketObjectDelete PacketDoorDestination PacketDoorState PacketObjectLock PacketObjectMove PacketObjectPlace
-        PacketObjectReset PacketObjectRotate PacketObjectScale PacketObjectSpawn PacketObjectState PacketObjectTrap
-        PacketMusicPlay PacketVideoPlay PacketScriptLocalShort PacketScriptLocalFloat PacketScriptMemberShort
-        PacketScriptMemberFloat PacketScriptGlobalShort PacketScriptGlobalFloat
+        PacketConsoleCommand PacketContainer PacketObjectActivate PacketObjectAnimPlay PacketObjectAttach
+        PacketObjectCollision PacketObjectDelete PacketDoorDestination PacketDoorState PacketObjectLock
+        PacketObjectMove PacketObjectPlace PacketObjectReset PacketObjectRotate PacketObjectScale
+        PacketObjectSpawn PacketObjectState PacketObjectTrap PacketMusicPlay PacketVideoPlay PacketScriptLocalShort
+        PacketScriptLocalFloat PacketScriptMemberShort PacketScriptMemberFloat PacketScriptGlobalShort
+        PacketScriptGlobalFloat
         )
 
 add_component_dir (openmw-mp/Packets/Worldstate
         WorldstatePacket
 
-        PacketRecordDynamic PacketWorldCollisionOverride PacketWorldMap PacketWorldTime
+        PacketCellCreate PacketCellReplace PacketRecordDynamic PacketWorldCollisionOverride PacketWorldMap
+        PacketWorldTime
         )
 
 add_component_dir (fallback
     fallback validate
     )
-
-if(NOT WIN32 AND NOT ANDROID)
-    add_component_dir (crashcatcher
-        crashcatcher
-    )
-endif()
 
 set (ESM_UI ${CMAKE_SOURCE_DIR}/files/ui/contentselector.ui
     )

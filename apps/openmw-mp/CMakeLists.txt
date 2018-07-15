@@ -105,7 +105,7 @@ set(PROCESSORS_PLAYER
         processors/player/ProcessorPlayerCellState.hpp processors/player/ProcessorPlayerCharClass.hpp
         processors/player/ProcessorPlayerCharGen.hpp processors/player/ProcessorPlayerDeath.hpp
         processors/player/ProcessorPlayerDisposition.hpp processors/player/ProcessorPlayerEquipment.hpp
-        processors/player/ProcessorPlayerFaction.hpp processors/player/ProcessorPlayerInteraction.hpp
+        processors/player/ProcessorPlayerFaction.hpp processors/player/ProcessorPlayerInput.hpp
         processors/player/ProcessorPlayerInventory.hpp processors/player/ProcessorPlayerJournal.hpp
         processors/player/ProcessorPlayerKillCount.hpp processors/player/ProcessorPlayerLevel.hpp
         processors/player/ProcessorPlayerMiscellaneous.hpp processors/player/ProcessorPlayerPosition.hpp
@@ -120,15 +120,16 @@ source_group(tes3mp-server\\processors\\player FILES ${PROCESSORS_PLAYER})
 
 set(PROCESSORS_OBJECT
         processors/object/ProcessorContainer.hpp processors/object/ProcessorDoorState.hpp
-        processors/object/ProcessorMusicPlay.hpp processors/object/ProcessorObjectAnimPlay.hpp
-        processors/object/ProcessorObjectDelete.hpp processors/object/ProcessorObjectLock.hpp
-        processors/object/ProcessorObjectMove.hpp processors/object/ProcessorObjectPlace.hpp
-        processors/object/ProcessorObjectRotate.hpp processors/object/ProcessorObjectScale.hpp
-        processors/object/ProcessorObjectSpawn.hpp processors/object/ProcessorObjectState.hpp
-        processors/object/ProcessorObjectTrap.hpp processors/object/ProcessorScriptLocalShort.hpp
-        processors/object/ProcessorScriptLocalFloat.hpp processors/object/ProcessorScriptMemberShort.hpp
-        processors/object/ProcessorScriptMemberFloat.hpp processors/object/ProcessorScriptGlobalShort.hpp
-        processors/object/ProcessorScriptGlobalFloat.hpp processors/object/ProcessorVideoPlay.hpp
+        processors/object/ProcessorMusicPlay.hpp processors/object/ProcessorObjectActivate.hpp
+        processors/object/ProcessorObjectAnimPlay.hpp processors/object/ProcessorObjectDelete.hpp
+        processors/object/ProcessorObjectLock.hpp processors/object/ProcessorObjectMove.hpp
+        processors/object/ProcessorObjectPlace.hpp processors/object/ProcessorObjectRotate.hpp
+        processors/object/ProcessorObjectScale.hpp processors/object/ProcessorObjectSpawn.hpp
+        processors/object/ProcessorObjectState.hpp processors/object/ProcessorObjectTrap.hpp
+        processors/object/ProcessorScriptLocalShort.hpp processors/object/ProcessorScriptLocalFloat.hpp
+        processors/object/ProcessorScriptMemberShort.hpp processors/object/ProcessorScriptMemberFloat.hpp
+        processors/object/ProcessorScriptGlobalShort.hpp processors/object/ProcessorScriptGlobalFloat.hpp
+        processors/object/ProcessorVideoPlay.hpp
         )
 
 source_group(tes3mp-server\\processors\\object FILES ${PROCESSORS_OBJECT})
