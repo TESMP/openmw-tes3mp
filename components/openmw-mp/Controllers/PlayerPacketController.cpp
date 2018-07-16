@@ -5,7 +5,6 @@
 #include "../Packets/Player/PacketGUIBoxes.hpp"
 #include "../Packets/Player/PacketLoaded.hpp"
 #include "../Packets/Player/PacketGameSettings.hpp"
-#include "../Packets/Player/PacketGameWeather.hpp"
 #include "../Packets/Player/PacketPlayerActiveSkills.hpp"
 #include "../Packets/Player/PacketPlayerAnimFlags.hpp"
 #include "../Packets/Player/PacketPlayerAnimPlay.hpp"
@@ -25,7 +24,7 @@
 #include "../Packets/Player/PacketPlayerInventory.hpp"
 #include "../Packets/Player/PacketPlayerJail.hpp"
 #include "../Packets/Player/PacketPlayerJournal.hpp"
-#include "../Packets/Player/PacketPlayerKillCount.hpp"
+#include "../Packets/Player/PacketWorldKillCount.hpp"
 #include "../Packets/Player/PacketPlayerLevel.hpp"
 #include "../Packets/Player/PacketPlayerMiscellaneous.hpp"
 #include "../Packets/Player/PacketPlayerMomentum.hpp"
@@ -60,7 +59,6 @@ mwmp::PlayerPacketController::PlayerPacketController(RakNet::RakPeerInterface *p
     AddPacket<PacketGUIBoxes>(&packets, peer);
     AddPacket<PacketLoaded>(&packets, peer);
     AddPacket<PacketGameSettings>(&packets, peer);
-    AddPacket<PacketGameWeather>(&packets, peer);
     AddPacket<PacketPlayerActiveSkills>(&packets, peer);
 
     AddPacket<PacketPlayerAnimFlags>(&packets, peer);
@@ -82,7 +80,7 @@ mwmp::PlayerPacketController::PlayerPacketController(RakNet::RakPeerInterface *p
     AddPacket<PacketPlayerInventory>(&packets, peer);
     AddPacket<PacketPlayerJail>(&packets, peer);
     AddPacket<PacketPlayerJournal>(&packets, peer);
-    AddPacket<PacketPlayerKillCount>(&packets, peer);
+    AddPacket<PacketWorldKillCount>(&packets, peer);
     AddPacket<PacketPlayerLevel>(&packets, peer);
     AddPacket<PacketPlayerMiscellaneous>(&packets, peer);
     AddPacket<PacketPlayerMomentum>(&packets, peer);

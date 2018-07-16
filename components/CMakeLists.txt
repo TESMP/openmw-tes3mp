@@ -146,7 +146,7 @@ add_component_dir (version
     )
 
 add_component_dir (openmw-mp
-        Log Utils NetworkMessages Version
+        Log Utils ErrorMessages NetworkMessages Version
         )
 
 add_component_dir (openmw-mp/Base
@@ -176,13 +176,13 @@ add_component_dir (openmw-mp/Packets/Actor
 add_component_dir (openmw-mp/Packets/Player
         PlayerPacket
 
-        PacketHandshake PacketChatMessage PacketGUIBoxes PacketGameSettings PacketGameWeather
+        PacketHandshake PacketChatMessage PacketGUIBoxes PacketGameSettings
 
         PacketPlayerBaseInfo PacketPlayerCharGen PacketPlayerActiveSkills PacketPlayerAnimFlags PacketPlayerAnimPlay
         PacketPlayerAttack PacketPlayerAttribute PacketPlayerBehavior PacketPlayerBook PacketPlayerBounty
         PacketPlayerCellChange PacketPlayerCellState PacketPlayerClass PacketPlayerDeath PacketPlayerEquipment
         PacketPlayerFaction PacketPlayerInput PacketPlayerInventory PacketPlayerJail PacketPlayerJournal
-        PacketPlayerKillCount PacketPlayerLevel PacketPlayerMiscellaneous PacketPlayerMomentum PacketPlayerPosition
+        PacketWorldKillCount PacketPlayerLevel PacketPlayerMiscellaneous PacketPlayerMomentum PacketPlayerPosition
         PacketPlayerQuickKeys PacketPlayerRegionAuthority PacketPlayerReputation PacketPlayerRest PacketPlayerResurrect
         PacketPlayerShapeshift PacketPlayerSkill PacketPlayerSpeech PacketPlayerSpellbook PacketPlayerStatsDynamic
         PacketPlayerTopic
@@ -203,7 +203,7 @@ add_component_dir (openmw-mp/Packets/Worldstate
         WorldstatePacket
 
         PacketCellCreate PacketCellReplace PacketRecordDynamic PacketWorldCollisionOverride PacketWorldMap
-        PacketWorldTime
+        PacketWorldTime PacketWorldWeather
         )
 
 add_component_dir (fallback

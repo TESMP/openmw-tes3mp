@@ -6,7 +6,6 @@
 #include "player/ProcessorHandshake.hpp"
 #include "player/ProcessorUserDisconnected.hpp"
 #include "player/ProcessorGameSettings.hpp"
-#include "player/ProcessorGameWeather.hpp"
 #include "player/ProcessorPlayerAnimFlags.hpp"
 #include "player/ProcessorPlayerAnimPlay.hpp"
 #include "player/ProcessorPlayerAttack.hpp"
@@ -27,7 +26,7 @@
 #include "player/ProcessorPlayerInventory.hpp"
 #include "player/ProcessorPlayerJail.hpp"
 #include "player/ProcessorPlayerJournal.hpp"
-#include "player/ProcessorPlayerKillCount.hpp"
+#include "player/ProcessorWorldKillCount.hpp"
 #include "player/ProcessorPlayerLevel.hpp"
 #include "player/ProcessorPlayerMiscellaneous.hpp"
 #include "player/ProcessorPlayerMomentum.hpp"
@@ -95,6 +94,7 @@
 #include "worldstate/ProcessorWorldCollisionOverride.hpp"
 #include "worldstate/ProcessorWorldMap.hpp"
 #include "worldstate/ProcessorWorldTime.hpp"
+#include "worldstate/ProcessorWorldWeather.hpp"
 
 using namespace mwmp;
 
@@ -105,7 +105,6 @@ void ProcessorInitializer()
     PlayerProcessor::AddProcessor(new ProcessorHandshake());
     PlayerProcessor::AddProcessor(new ProcessorUserDisconnected());
     PlayerProcessor::AddProcessor(new ProcessorGameSettings());
-    PlayerProcessor::AddProcessor(new ProcessorGameWeather());
     PlayerProcessor::AddProcessor(new ProcessorPlayerAnimFlags());
     PlayerProcessor::AddProcessor(new ProcessorPlayerAnimPlay());
     PlayerProcessor::AddProcessor(new ProcessorPlayerAttack());
@@ -126,7 +125,7 @@ void ProcessorInitializer()
     PlayerProcessor::AddProcessor(new ProcessorPlayerInventory());
     PlayerProcessor::AddProcessor(new ProcessorPlayerJail());
     PlayerProcessor::AddProcessor(new ProcessorPlayerJournal());
-    PlayerProcessor::AddProcessor(new ProcessorPlayerKillCount());
+    PlayerProcessor::AddProcessor(new ProcessorWorldKillCount());
     PlayerProcessor::AddProcessor(new ProcessorPlayerLevel());
     PlayerProcessor::AddProcessor(new ProcessorPlayerMiscellaneous());
     PlayerProcessor::AddProcessor(new ProcessorPlayerMomentum());
@@ -191,4 +190,5 @@ void ProcessorInitializer()
     WorldstateProcessor::AddProcessor(new ProcessorWorldCollisionOverride());
     WorldstateProcessor::AddProcessor(new ProcessorWorldMap());
     WorldstateProcessor::AddProcessor(new ProcessorWorldTime());
+    WorldstateProcessor::AddProcessor(new ProcessorWorldWeather());
 }

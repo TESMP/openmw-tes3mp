@@ -6,7 +6,6 @@
 #include "PlayerProcessor.hpp"
 #include "player/ProcessorChatMsg.hpp"
 #include "player/ProcessorGUIMessageBox.hpp"
-#include "player/ProcessorGameWeather.hpp"
 #include "player/ProcessorPlayerCharGen.hpp"
 #include "player/ProcessorPlayerAnimFlags.hpp"
 #include "player/ProcessorPlayerAnimPlay.hpp"
@@ -23,7 +22,7 @@
 #include "player/ProcessorPlayerFaction.hpp"
 #include "player/ProcessorPlayerInventory.hpp"
 #include "player/ProcessorPlayerJournal.hpp"
-#include "player/ProcessorPlayerKillCount.hpp"
+#include "player/ProcessorWorldKillCount.hpp"
 #include "player/ProcessorPlayerInput.hpp"
 #include "player/ProcessorPlayerLevel.hpp"
 #include "player/ProcessorPlayerMiscellaneous.hpp"
@@ -77,6 +76,7 @@
 #include "WorldstateProcessor.hpp"
 #include "worldstate/ProcessorRecordDynamic.hpp"
 #include "worldstate/ProcessorWorldMap.hpp"
+#include "worldstate/ProcessorWorldWeather.hpp"
 
 using namespace mwmp;
 
@@ -84,7 +84,6 @@ void ProcessorInitializer()
 {
     PlayerProcessor::AddProcessor(new ProcessorChatMsg());
     PlayerProcessor::AddProcessor(new ProcessorGUIMessageBox());
-    PlayerProcessor::AddProcessor(new ProcessorGameWeather());
     PlayerProcessor::AddProcessor(new ProcessorPlayerCharGen());
     PlayerProcessor::AddProcessor(new ProcessorPlayerAnimFlags());
     PlayerProcessor::AddProcessor(new ProcessorPlayerAnimPlay());
@@ -101,7 +100,7 @@ void ProcessorInitializer()
     PlayerProcessor::AddProcessor(new ProcessorPlayerFaction());
     PlayerProcessor::AddProcessor(new ProcessorPlayerInventory());
     PlayerProcessor::AddProcessor(new ProcessorPlayerJournal());
-    PlayerProcessor::AddProcessor(new ProcessorPlayerKillCount());
+    PlayerProcessor::AddProcessor(new ProcessorWorldKillCount());
     PlayerProcessor::AddProcessor(new ProcessorPlayerInput());
     PlayerProcessor::AddProcessor(new ProcessorPlayerLevel());
     PlayerProcessor::AddProcessor(new ProcessorPlayerMiscellaneous());
@@ -155,4 +154,5 @@ void ProcessorInitializer()
 
     WorldstateProcessor::AddProcessor(new ProcessorRecordDynamic());
     WorldstateProcessor::AddProcessor(new ProcessorWorldMap());
+    WorldstateProcessor::AddProcessor(new ProcessorWorldWeather());
 }

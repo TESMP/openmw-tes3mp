@@ -1005,7 +1005,20 @@ namespace MWClass
             Don't display a dialogue screen for two players interacting with each other
         */
         if (actor == MWMechanics::getPlayer() && mwmp::PlayerList::isDedicatedPlayer(ptr))
-            return std::shared_ptr<MWWorld::Action>(new MWWorld::FailedAction("Not implemented."));
+            return std::shared_ptr<MWWorld::Action>(new MWWorld::FailedAction(""));
+        /*
+            End of tes3mp addition
+        */
+
+        /*
+            Start of tes3mp addition
+
+            Avoid returning an ActionTalk when a non-player NPC activates another
+            non-player NPC, because it will always pop up a dialogue screen for
+            the local player
+        */
+        if (ptr != MWMechanics::getPlayer() && actor != MWMechanics::getPlayer())
+            return std::shared_ptr<MWWorld::Action>(new MWWorld::FailedAction(""));
         /*
             End of tes3mp addition
         */
