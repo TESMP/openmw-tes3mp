@@ -18,6 +18,15 @@ namespace mwmp
         std::vector<char> imageData;
     };
 
+    struct Weather
+    {
+        std::string region;
+        unsigned int currentWeather;
+        unsigned int nextWeather;
+        unsigned int queuedWeather;
+        float transitionFactor;
+    };
+
     class BaseWorldstate
     {
     public:
@@ -47,9 +56,14 @@ namespace mwmp
         bool hasPlacedObjectCollision;
         bool useActorCollisionForPlacedObjects;
 
+        std::string authorityRegion;
+
         std::vector<std::string> enforcedCollisionRefIds;
 
         std::vector<MapTile> mapTiles;
+
+        bool forceWeather;
+        Weather weather;
 
         bool isValid;
     };
