@@ -2,30 +2,31 @@
 #define OPENMW_QUESTAPI_HPP
 
 #define QUESTAPI \
-    {"InitializeJournalChanges",  QuestFunctions::InitializeJournalChanges},\
-    {"InitializeKillChanges",     QuestFunctions::InitializeKillChanges},\
+    {"InitializeJournalChanges",          QuestFunctions::InitializeJournalChanges},\
+    {"InitializeKillChanges",             QuestFunctions::InitializeKillChanges},\
     \
-    {"GetJournalChangesSize",     QuestFunctions::GetJournalChangesSize},\
-    {"GetKillChangesSize",        QuestFunctions::GetKillChangesSize},\
+    {"GetJournalChangesSize",             QuestFunctions::GetJournalChangesSize},\
+    {"GetKillChangesSize",                QuestFunctions::GetKillChangesSize},\
     \
-    {"AddJournalEntry",           QuestFunctions::AddJournalEntry},\
-    {"AddJournalIndex",           QuestFunctions::AddJournalIndex},\
-    {"AddKill",                   QuestFunctions::AddKill},\
+    {"AddJournalEntry",                   QuestFunctions::AddJournalEntry},\
+    {"AddJournalEntryWithTimestamp",      QuestFunctions::AddJournalEntryWithTimestamp},\
+    {"AddJournalIndex",                   QuestFunctions::AddJournalIndex},\
+    {"AddKill",                           QuestFunctions::AddKill},\
     \
-    {"SetReputation",             QuestFunctions::SetReputation},\
+    {"SetReputation",                     QuestFunctions::SetReputation},\
     \
-    {"GetJournalItemQuest",       QuestFunctions::GetJournalItemQuest},\
-    {"GetJournalItemIndex",       QuestFunctions::GetJournalItemIndex},\
-    {"GetJournalItemType",        QuestFunctions::GetJournalItemType},\
-    {"GetJournalItemActorRefId",  QuestFunctions::GetJournalItemActorRefId},\
-    {"GetKillRefId",              QuestFunctions::GetKillRefId},\
-    {"GetKillNumber",             QuestFunctions::GetKillNumber},\
+    {"GetJournalItemQuest",               QuestFunctions::GetJournalItemQuest},\
+    {"GetJournalItemIndex",               QuestFunctions::GetJournalItemIndex},\
+    {"GetJournalItemType",                QuestFunctions::GetJournalItemType},\
+    {"GetJournalItemActorRefId",          QuestFunctions::GetJournalItemActorRefId},\
+    {"GetKillRefId",                      QuestFunctions::GetKillRefId},\
+    {"GetKillNumber",                     QuestFunctions::GetKillNumber},\
     \
-    {"GetReputation",             QuestFunctions::GetReputation},\
+    {"GetReputation",                     QuestFunctions::GetReputation},\
     \
-    {"SendJournalChanges",        QuestFunctions::SendJournalChanges},\
-    {"SendKillChanges",           QuestFunctions::SendKillChanges},\
-    {"SendReputation",            QuestFunctions::SendReputation}
+    {"SendJournalChanges",                QuestFunctions::SendJournalChanges},\
+    {"SendKillChanges",                   QuestFunctions::SendKillChanges},\
+    {"SendReputation",                    QuestFunctions::SendReputation}
 
 class QuestFunctions
 {
@@ -68,7 +69,8 @@ public:
     static unsigned int GetKillChangesSize(unsigned short pid) noexcept;
 
     /**
-    * \brief Add a new journal item of type ENTRY to the journal changes for a player.
+    * \brief Add a new journal item of type ENTRY to the journal changes for a player,
+    *  with a specific timestamp.
     *
     * \param pid The player ID whose journal changes should be used.
     * \param quest The quest of the journal item.
@@ -77,6 +79,22 @@ public:
     * \return void
     */
     static void AddJournalEntry(unsigned short pid, const char* quest, unsigned int index, const char* actorRefId) noexcept;
+
+    /**
+    * \brief Add a new journal item of type ENTRY to the journal changes for a player,
+    *  with a specific timestamp.
+    *
+    * \param pid The player ID whose journal changes should be used.
+    * \param quest The quest of the journal item.
+    * \param index The quest index of the journal item.
+    * \param actorRefId The actor refId of the journal item.
+    * \param The daysPassed for the journal item.
+    * \param The month for the journal item.
+    * \param The day of the month for the journal item.
+    * \return void
+    */
+    static void AddJournalEntryWithTimestamp(unsigned short pid, const char* quest, unsigned int index, const char* actorRefId,
+        unsigned int daysPassed, unsigned int month, unsigned int day) noexcept;
 
     /**
     * \brief Add a new journal item of type INDEX to the journal changes for a player.
@@ -111,28 +129,28 @@ public:
     * \brief Get the quest at a certain index in a player's latest journal changes.
     *
     * \param pid The player ID whose journal changes should be used.
-    * \param i The index of the journalItem.
+    * \param index The index of the journalItem.
     * \return The quest.
     */
-    static const char *GetJournalItemQuest(unsigned short pid, unsigned int i) noexcept;
+    static const char *GetJournalItemQuest(unsigned short pid, unsigned int index) noexcept;
 
     /**
     * \brief Get the quest index at a certain index in a player's latest journal changes.
     *
     * \param pid The player ID whose journal changes should be used.
-    * \param i The index of the journalItem.
+    * \param index The index of the journalItem.
     * \return The quest index.
     */
-    static int GetJournalItemIndex(unsigned short pid, unsigned int i) noexcept;
+    static int GetJournalItemIndex(unsigned short pid, unsigned int index) noexcept;
 
     /**
     * \brief Get the journal item type at a certain index in a player's latest journal changes.
     *
     * \param pid The player ID whose journal changes should be used.
-    * \param i The index of the journalItem.
+    * \param index The index of the journalItem.
     * \return The type (0 for ENTRY, 1 for INDEX).
     */
-    static int GetJournalItemType(unsigned short pid, unsigned int i) noexcept;
+    static int GetJournalItemType(unsigned short pid, unsigned int index) noexcept;
 
     /**
     * \brief Get the actor refId at a certain index in a player's latest journal changes.
@@ -140,28 +158,28 @@ public:
     * Every journal change has an associated actor, which is usually the quest giver.
     *
     * \param pid The player ID whose journal changes should be used.
-    * \param i The index of the journalItem.
+    * \param index The index of the journalItem.
     * \return The actor refId.
     */
-    static const char *GetJournalItemActorRefId(unsigned short pid, unsigned int i) noexcept;
+    static const char *GetJournalItemActorRefId(unsigned short pid, unsigned int index) noexcept;
 
     /**
     * \brief Get the refId at a certain index in a player's latest kill count changes.
     *
     * \param pid The player ID whose kill count changes should be used.
-    * \param i The index of the kill count.
+    * \param index The index of the kill count.
     * \return The refId.
     */
-    static const char *GetKillRefId(unsigned short pid, unsigned int i) noexcept;
+    static const char *GetKillRefId(unsigned short pid, unsigned int index) noexcept;
 
     /**
     * \brief Get the number of kills at a certain index in a player's latest kill count changes.
     *
     * \param pid The player ID whose kill count changes should be used.
-    * \param i The index of the kill count.
+    * \param index The index of the kill count.
     * \return The number of kills.
     */
-    static int GetKillNumber(unsigned short pid, unsigned int i) noexcept;
+    static int GetKillNumber(unsigned short pid, unsigned int index) noexcept;
 
     /**
     * \brief Get the a certain player's reputation.
