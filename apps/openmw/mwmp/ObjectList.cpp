@@ -6,6 +6,7 @@
 #include "DedicatedPlayer.hpp"
 #include "PlayerList.hpp"
 #include "CellController.hpp"
+#include "RecordHelper.hpp"
 
 #include <components/openmw-mp/Log.hpp>
 
@@ -78,6 +79,7 @@ void ObjectList::addContainerItem(mwmp::BaseObject& baseObject, const MWWorld::P
     containerItem.count = itemPtr.getRefData().getCount();
     containerItem.charge = itemPtr.getCellRef().getCharge();
     containerItem.enchantmentCharge = itemPtr.getCellRef().getEnchantmentCharge();
+    containerItem.soul = itemPtr.getCellRef().getSoul();
     containerItem.actionCount = actionCount;
 
     LOG_APPEND(Log::LOG_VERBOSE, "--- Adding container item %s", containerItem.refId.c_str());
@@ -174,6 +176,9 @@ void ObjectList::editContainers(MWWorld::CellStore* cellStore)
                     if (containerItem.enchantmentCharge > -1)
                         newPtr.getCellRef().setEnchantmentCharge(containerItem.enchantmentCharge);
 
+                    if (!containerItem.soul.empty())
+                        newPtr.getCellRef().setSoul(containerItem.soul);
+
                     containerStore.add(newPtr, containerItem.count, ownerPtr, true);
                 }
 
@@ -186,7 +191,8 @@ void ObjectList::editContainers(MWWorld::CellStore* cellStore)
                         if (Misc::StringUtils::ciEqual(itemPtr.getCellRef().getRefId(), containerItem.refId))
                         {
                             if (itemPtr.getCellRef().getCharge() == containerItem.charge &&
-                                itemPtr.getCellRef().getEnchantmentCharge() == containerItem.enchantmentCharge)
+                                itemPtr.getCellRef().getEnchantmentCharge() == containerItem.enchantmentCharge &&
+                                Misc::StringUtils::ciEqual(itemPtr.getCellRef().getSoul(), containerItem.soul))
                             {
                                 // Store the sound of the first item in a TAKE_ALL
                                 if (isLocalTakeAll && takeAllSound.empty())
@@ -327,8 +333,9 @@ void ObjectList::placeObjects(MWWorld::CellStore* cellStore)
 
     for (const auto &baseObject : baseObjects)
     {
-        LOG_APPEND(Log::LOG_VERBOSE, "- cellRef: %s %i-%i, count: %i, charge: %i, enchantmentCharge: %i", baseObject.refId.c_str(),
-                   baseObject.refNum, baseObject.mpNum, baseObject.count, baseObject.charge, baseObject.enchantmentCharge);
+        LOG_APPEND(Log::LOG_VERBOSE, "- cellRef: %s %i-%i, count: %i, charge: %i, enchantmentCharge: %i, soul: %s",
+            baseObject.refId.c_str(), baseObject.refNum, baseObject.mpNum, baseObject.count, baseObject.charge,
+            baseObject.enchantmentCharge, baseObject.soul.c_str());
 
         // Ignore generic dynamic refIds because they could be anything on other clients
         if (baseObject.refId.find("$dynamic") != string::npos)
@@ -354,6 +361,9 @@ void ObjectList::placeObjects(MWWorld::CellStore* cellStore)
                 if (baseObject.enchantmentCharge > -1)
                     newPtr.getCellRef().setEnchantmentCharge(baseObject.enchantmentCharge);
 
+                if (!baseObject.soul.empty())
+                    newPtr.getCellRef().setSoul(baseObject.soul);
+
                 newPtr.getCellRef().setGoldValue(baseObject.goldValue);
                 newPtr = world->placeObject(newPtr, cellStore, baseObject.position);
 
@@ -366,7 +376,7 @@ void ObjectList::placeObjects(MWWorld::CellStore* cellStore)
             }
             catch (std::exception&)
             {
-                LOG_APPEND(Log::LOG_INFO, "-- Ignored placement of invalid object");
+                LOG_MESSAGE_SIMPLE(Log::LOG_ERROR, "Ignored placement of invalid object %s", baseObject.refId.c_str());
             }
         }
         else
@@ -384,6 +394,11 @@ void ObjectList::spawnObjects(MWWorld::CellStore* cellStore)
         // Ignore generic dynamic refIds because they could be anything on other clients
         if (baseObject.refId.find("$dynamic") != string::npos)
             continue;
+        else if (!RecordHelper::doesCreatureExist(baseObject.refId) && !RecordHelper::doesNpcExist(baseObject.refId))
+        {
+            LOG_MESSAGE_SIMPLE(Log::LOG_ERROR, "Ignored spawning of invalid object %s", baseObject.refId.c_str());
+            continue;
+        }
 
         MWWorld::Ptr ptrFound = cellStore->searchExact(0, baseObject.mpNum);
 
@@ -396,6 +411,7 @@ void ObjectList::spawnObjects(MWWorld::CellStore* cellStore)
             newPtr.getCellRef().setMpNum(baseObject.mpNum);
 
             newPtr = MWBase::Environment::get().getWorld()->placeObject(newPtr, cellStore, baseObject.position);
+            MWMechanics::CreatureStats& creatureStats = newPtr.getClass().getCreatureStats(newPtr);
 
             if (baseObject.isSummon)
             {
@@ -411,7 +427,7 @@ void ObjectList::spawnObjects(MWWorld::CellStore* cellStore)
                     LOG_APPEND(Log::LOG_VERBOSE, "-- Actor has master: %s", masterPtr.getCellRef().getRefId().c_str());
 
                     MWMechanics::AiFollow package(masterPtr);
-                    newPtr.getClass().getCreatureStats(newPtr).getAiSequence().stack(package, newPtr);
+                    creatureStats.getAiSequence().stack(package, newPtr);
 
                     MWRender::Animation* anim = MWBase::Environment::get().getWorld()->getAnimation(newPtr);
                     if (anim)
@@ -884,7 +900,7 @@ void ObjectList::addObjectPlace(const MWWorld::Ptr& ptr, bool droppedByPlayer)
 {
     if (ptr.getCellRef().getRefId().find("$dynamic") != string::npos)
     {
-        MWBase::Environment::get().getWindowManager()->messageBox("You're trying to place a custom item, but those are not synchronized in multiplayer yet.");
+        MWBase::Environment::get().getWindowManager()->messageBox("You cannot place unsynchronized custom items in multiplayer.");
         return;
     }
 
@@ -896,6 +912,7 @@ void ObjectList::addObjectPlace(const MWWorld::Ptr& ptr, bool droppedByPlayer)
     baseObject.mpNum = 0;
     baseObject.charge = ptr.getCellRef().getCharge();
     baseObject.enchantmentCharge = ptr.getCellRef().getEnchantmentCharge();
+    baseObject.soul = ptr.getCellRef().getSoul();
     baseObject.droppedByPlayer = droppedByPlayer;
     baseObject.hasContainer = ptr.getClass().hasContainerStore(ptr);
 
@@ -917,7 +934,8 @@ void ObjectList::addObjectSpawn(const MWWorld::Ptr& ptr)
 {
     if (ptr.getCellRef().getRefId().find("$dynamic") != string::npos)
     {
-        MWBase::Environment::get().getWindowManager()->messageBox("You're trying to spawn a custom object, but those are not synchronized in multiplayer yet.");
+        MWBase::Environment::get().getWindowManager()->messageBox("You're trying to spawn a custom object lacking a server-given refId, "
+            "and those cannot be synchronized in multiplayer.");
         return;
     }
 

@@ -13,6 +13,13 @@ bool RecordHelper::doesCreatureExist(const std::string& refId)
     return world->getStore().get<ESM::Creature>().search(refId);
 }
 
+bool RecordHelper::doesNpcExist(const std::string& refId)
+{
+    MWBase::World *world = MWBase::Environment::get().getWorld();
+
+    return world->getStore().get<ESM::NPC>().search(refId);
+}
+
 bool RecordHelper::doesRaceExist(const std::string& raceId)
 {
     MWBase::World *world = MWBase::Environment::get().getWorld();
@@ -34,22 +41,37 @@ std::string RecordHelper::createNpcRecord(const ESM::NPC& npc)
     return world->createRecord(npc)->mId;
 }
 
-void RecordHelper::updateCreatureRecord(const ESM::Creature& creature)
+void RecordHelper::overrideCreatureRecord(const ESM::Creature& creature)
 {
     MWBase::World *world = MWBase::Environment::get().getWorld();
 
-    MWWorld::ESMStore *esmStore = const_cast<MWWorld::ESMStore *>(&world->getStore());
-    MWWorld::Store<ESM::Creature> *creatureStore = const_cast<MWWorld::Store<ESM::Creature> *> (&esmStore->get<ESM::Creature>());
-
-    creatureStore->insert(creature);
+    world->getModifiableStore().overrideRecord(creature);
 }
 
-void RecordHelper::updateNpcRecord(const ESM::NPC& npc)
+void RecordHelper::overrideNpcRecord(const ESM::NPC& npc)
 {
     MWBase::World *world = MWBase::Environment::get().getWorld();
 
-    MWWorld::ESMStore *esmStore = const_cast<MWWorld::ESMStore *>(&world->getStore());
-    MWWorld::Store<ESM::NPC> *npcStore = const_cast<MWWorld::Store<ESM::NPC> *> (&esmStore->get<ESM::NPC>());
+    world->getModifiableStore().overrideRecord(npc);
+}
 
-    npcStore->insert(npc);
+void RecordHelper::overrideEnchantmentRecord(const ESM::Enchantment& enchantment)
+{
+    MWBase::World *world = MWBase::Environment::get().getWorld();
+
+    world->getModifiableStore().overrideRecord(enchantment);
+}
+
+void RecordHelper::overridePotionRecord(const ESM::Potion& potion)
+{
+    MWBase::World *world = MWBase::Environment::get().getWorld();
+
+    world->getModifiableStore().overrideRecord(potion);
+}
+
+void RecordHelper::overrideSpellRecord(const ESM::Spell& spell)
+{
+    MWBase::World *world = MWBase::Environment::get().getWorld();
+
+    world->getModifiableStore().overrideRecord(spell);
 }
