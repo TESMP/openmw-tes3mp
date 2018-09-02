@@ -71,10 +71,10 @@ namespace mwmp
 
         void sendClass();
         void sendInventory();
+        void sendItemChange(const MWWorld::Ptr& itemPtr, int count, unsigned int action);
+        void sendItemChange(const std::string& refId, int count, unsigned int action);
         void sendSpellbook();
-        void sendCellStates();
-        void sendSpellAddition(std::string id);
-        void sendSpellRemoval(std::string id);
+        void sendSpellChange(std::string id, unsigned int action);
         void sendQuickKey(unsigned short slot, int type, const std::string& itemId = "");
         void sendJournalEntry(const std::string& quest, int index, const MWWorld::Ptr& actor);
         void sendJournalIndex(const std::string& quest, int index);
@@ -88,6 +88,7 @@ namespace mwmp
         void sendMarkLocation(const ESM::Cell& newMarkCell, const ESM::Position& newMarkPosition);
         void sendSelectedSpell(const std::string& newSelectedSpellId);
         void sendItemUse(const MWWorld::Ptr& itemPtr);
+        void sendCellStates();
 
         void clearCellStates();
         void clearCurrentContainer();
