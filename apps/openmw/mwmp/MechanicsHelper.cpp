@@ -31,6 +31,16 @@ osg::Vec3f MechanicsHelper::getLinearInterpolation(osg::Vec3f start, osg::Vec3f 
     return (start + osg::componentMultiply(position, (end - start)));
 }
 
+ESM::Position MechanicsHelper::getPositionFromVector(osg::Vec3f vector)
+{
+    ESM::Position position;
+    position.pos[0] = vector.x();
+    position.pos[1] = vector.y();
+    position.pos[2] = vector.z();
+
+    return position;
+}
+
 // Inspired by similar code in mwclass\creaturelevlist.cpp
 void MechanicsHelper::spawnLeveledCreatures(MWWorld::CellStore* cellStore)
 {
@@ -63,6 +73,26 @@ void MechanicsHelper::spawnLeveledCreatures(MWWorld::CellStore* cellStore)
 
     if (spawnCount > 0)
         objectList->sendObjectSpawn();
+}
+
+bool MechanicsHelper::isUsingRangedWeapon(const MWWorld::Ptr& ptr)
+{
+    if (ptr.getClass().hasInventoryStore(ptr))
+    {
+        MWWorld::InventoryStore &inventoryStore = ptr.getClass().getInventoryStore(ptr);
+        MWWorld::ContainerStoreIterator weaponSlot = inventoryStore.getSlot(
+            MWWorld::InventoryStore::Slot_CarriedRight);
+
+        if (weaponSlot != inventoryStore.end())
+        {
+            const ESM::Weapon* weaponRecord = weaponSlot->get<ESM::Weapon>()->mBase;
+
+            if (weaponRecord->mData.mType >= ESM::Weapon::MarksmanBow)
+                return true;
+        }
+    }
+
+    return false;
 }
 
 Attack *MechanicsHelper::getLocalAttack(const MWWorld::Ptr& ptr)
@@ -178,6 +208,7 @@ void MechanicsHelper::resetAttack(Attack* attack)
     attack->block = false;
     attack->applyWeaponEnchantment = false;
     attack->applyProjectileEnchantment = false;
+    attack->hitPosition.pos[0] = attack->hitPosition.pos[1] = attack->hitPosition.pos[2] = 0;
     attack->target.guid = RakNet::RakNetGUID();
     attack->target.refId.clear();
     attack->target.refNum = 0;
@@ -193,13 +224,15 @@ void MechanicsHelper::processAttack(Attack attack, const MWWorld::Ptr& attacker)
 {
     if (!attack.pressed)
     {
-        LOG_MESSAGE_SIMPLE(Log::LOG_VERBOSE, "Processing attack from %s",
-            attacker.getCellRef().getRefId().c_str());
+        LOG_MESSAGE_SIMPLE(Log::LOG_VERBOSE, "Processing attack from %s of type %i",
+            attacker.getCellRef().getRefId().c_str(), attack.type);
         LOG_APPEND(Log::LOG_VERBOSE, "- success: %s", attack.success ? "true" : "false");
 
         if (attack.success)
             LOG_APPEND(Log::LOG_VERBOSE, "- damage: %f", attack.damage);
     }
+
+    LOG_APPEND(Log::LOG_VERBOSE, "- pressed: %s", attack.pressed ? "true" : "false");
 
     MWMechanics::CreatureStats &attackerStats = attacker.getClass().getCreatureStats(attacker);
     MWWorld::Ptr victim;
@@ -220,12 +253,14 @@ void MechanicsHelper::processAttack(Attack attack, const MWWorld::Ptr& attacker)
             victim = controller->getDedicatedActor(attack.target.refNum, attack.target.mpNum)->getPtr();
     }
 
-    // Get the weapon used (if hand-to-hand, weapon = inv.end())
-    if (attack.type == attack.MELEE)
+    if (attack.type == attack.MELEE || attack.type == attack.RANGED)
     {
+        bool isRanged = attack.type == attack.RANGED;
+
         MWWorld::Ptr weapon;
         MWWorld::Ptr projectile;
 
+        // Get the weapon used; if using hand-to-hand, the weapon is equal to inv.end()
         if (attacker.getClass().hasInventoryStore(attacker))
         {
             MWWorld::InventoryStore &inventoryStore = attacker.getClass().getInventoryStore(attacker);
@@ -242,40 +277,45 @@ void MechanicsHelper::processAttack(Attack attack, const MWWorld::Ptr& attacker)
                 weapon = MWWorld::Ptr();
         }
 
+        if (!weapon.isEmpty())
+        {
+            LOG_APPEND(Log::LOG_VERBOSE, "- weapon: %s\n- isRanged: %s\n- applyWeaponEnchantment: %s\n- applyProjectileEnchantment: %s",
+                weapon.getCellRef().getRefId().c_str(), isRanged ? "true" : "false", attack.applyWeaponEnchantment ? "true" : "false",
+                attack.applyProjectileEnchantment ? "true" : "false");
+
+            if (attack.applyWeaponEnchantment)
+            {
+                MWMechanics::CastSpell cast(attacker, victim, isRanged);
+                cast.mHitPosition = attack.hitPosition.asVec3();
+
+                cast.cast(weapon, false);
+            }
+
+            if (isRanged && !projectile.isEmpty() && attack.applyProjectileEnchantment)
+            {
+                MWMechanics::CastSpell cast(attacker, victim, isRanged);
+                cast.mHitPosition = attack.hitPosition.asVec3();
+                cast.cast(projectile, false);
+            }
+        }
+
         if (victim.mRef != nullptr)
         {
-            bool healthdmg = true;
+            bool isHealthDamage = true;
 
             if (weapon.isEmpty())
             {
                 if (attacker.getClass().isBipedal(attacker))
                 {
-                    MWMechanics::CreatureStats &otherstats = victim.getClass().getCreatureStats(victim);
-                    healthdmg = otherstats.isParalyzed() || otherstats.getKnockedDown();
+                    MWMechanics::CreatureStats &victimStats = victim.getClass().getCreatureStats(victim);
+                    isHealthDamage = victimStats.isParalyzed() || victimStats.getKnockedDown();
                 }
             }
-            else
-            {
-                LOG_APPEND(Log::LOG_VERBOSE, "- weapon: %s", weapon.getCellRef().getRefId().c_str());
 
+            if (!isRanged)
                 MWMechanics::blockMeleeAttack(attacker, victim, weapon, attack.damage, 1);
 
-                if (attack.applyWeaponEnchantment)
-                {
-                    MWMechanics::CastSpell cast(attacker, victim, false);
-                    cast.mHitPosition = osg::Vec3f();
-                    cast.cast(weapon, false);
-                }
-
-                if (attack.applyProjectileEnchantment)
-                {
-                    MWMechanics::CastSpell cast(attacker, victim, false);
-                    cast.mHitPosition = osg::Vec3f();
-                    cast.cast(projectile, false);
-                }
-            }
-
-            victim.getClass().onHit(victim, attack.damage, healthdmg, weapon, attacker, osg::Vec3f(),
+            victim.getClass().onHit(victim, attack.damage, isHealthDamage, weapon, attacker, attack.hitPosition.asVec3(),
                 attack.success);
         }
     }
@@ -289,7 +329,7 @@ void MechanicsHelper::processAttack(Attack attack, const MWWorld::Ptr& attacker)
             attack.instant = false;
         }
 
-        LOG_APPEND(Log::LOG_VERBOSE, "- spellId: %s, success: %s", attack.spellId.c_str(), attack.success ? "true" : "false");
+        LOG_APPEND(Log::LOG_VERBOSE, "- spellId: %s", attack.spellId.c_str());
     }
     else if (attack.type == attack.ITEM_MAGIC)
     {
