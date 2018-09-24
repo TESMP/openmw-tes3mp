@@ -40,15 +40,25 @@ void PacketActorAttack::Actor(BaseActor &actor, bool send)
         }
         else
         {
-            RW(actor.attack.damage, send);
-            RW(actor.attack.block, send);
-            RW(actor.attack.knockdown, send);
+            RW(actor.attack.isHit, send);
 
-            RW(actor.attack.applyWeaponEnchantment, send);
-            RW(actor.attack.applyProjectileEnchantment, send);
-
-            if (actor.attack.success || actor.attack.applyWeaponEnchantment || actor.attack.applyProjectileEnchantment)
+            if (actor.attack.type == mwmp::Attack::RANGED)
             {
+                RW(actor.attack.attackStrength, send);
+                RW(actor.attack.rangedWeaponId, send);
+                RW(actor.attack.rangedAmmoId, send);
+            }
+
+            if (actor.attack.isHit)
+            {
+                RW(actor.attack.damage, send);
+                RW(actor.attack.block, send);
+                RW(actor.attack.knockdown, send);
+                RW(actor.attack.applyWeaponEnchantment, send);
+
+                if (actor.attack.type == mwmp::Attack::RANGED)
+                    RW(actor.attack.applyAmmoEnchantment, send);
+
                 RW(actor.attack.hitPosition.pos[0], send);
                 RW(actor.attack.hitPosition.pos[1], send);
                 RW(actor.attack.hitPosition.pos[2], send);

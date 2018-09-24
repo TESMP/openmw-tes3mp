@@ -5,6 +5,16 @@
 #include <components/resource/resourcesystem.hpp>
 #include <components/resource/scenemanager.hpp>
 
+/*
+    Start of tes3mp addition
+
+    Include additional headers for multiplayer purposes
+*/
+#include "../mwmp/MechanicsHelper.hpp"
+/*
+    End of tes3mp addition
+*/
+
 #include "../mwbase/world.hpp"
 #include "../mwbase/environment.hpp"
 #include "../mwbase/soundmanager.hpp"
@@ -99,6 +109,37 @@ void WeaponAnimation::releaseArrow(MWWorld::Ptr actor, float attackStrength)
     if (weapon->getTypeName() != typeid(ESM::Weapon).name())
         return;
 
+    /*
+        Start of tes3mp addition
+
+        If this is an attack by a LocalPlayer or LocalActor, record its attackStrength and
+        rangedWeaponId and prepare an attack packet for sending.
+
+        Unlike melee attacks, ranged attacks require the weapon and ammo IDs to be recorded
+        because players and actors can have multiple projectiles in the air at the same time.
+
+        If it's an attack by a DedicatedPlayer or DedicatedActor, apply the attackStrength
+        from their latest attack packet.
+    */
+    mwmp::Attack *localAttack = MechanicsHelper::getLocalAttack(actor);
+
+    if (localAttack)
+    {
+        localAttack->attackStrength = attackStrength;
+        localAttack->rangedWeaponId = weapon->getCellRef().getRefId();
+        localAttack->shouldSend = true;
+    }
+    else
+    {
+        mwmp::Attack *dedicatedAttack = MechanicsHelper::getDedicatedAttack(actor);
+
+        if (dedicatedAttack)
+            attackStrength = dedicatedAttack->attackStrength;
+    }
+    /*
+        End of tes3mp addition
+    */
+
     // The orientation of the launched projectile. Always the same as the actor orientation, even if the ArrowBone's orientation dictates otherwise.
     osg::Quat orient = osg::Quat(actor.getRefData().getPosition().rot[0], osg::Vec3f(-1,0,0))
             * osg::Quat(actor.getRefData().getPosition().rot[2], osg::Vec3f(0,0,-1));
@@ -110,6 +151,17 @@ void WeaponAnimation::releaseArrow(MWWorld::Ptr actor, float attackStrength)
 
     if (weapon->get<ESM::Weapon>()->mBase->mData.mType == ESM::Weapon::MarksmanThrown)
     {
+        /*
+            Start of tes3mp addition
+
+            If this is a local attack, clear the rangedAmmoId used for it
+        */
+        if (localAttack)
+            localAttack->rangedAmmoId = "";
+        /*
+            End of tes3mp addition
+        */
+
         // Thrown weapons get detached now
         osg::Node* weaponNode = getWeaponNode();
         if (!weaponNode)
@@ -138,6 +190,17 @@ void WeaponAnimation::releaseArrow(MWWorld::Ptr actor, float attackStrength)
 
         if (!mAmmunition)
             return;
+
+        /*
+            Start of tes3mp addition
+
+            If this is a local attack, record the rangedAmmoId used for it
+        */
+        if (localAttack)
+            localAttack->rangedAmmoId = ammo->getCellRef().getRefId();
+        /*
+            End of tes3mp addition
+        */
 
         osg::ref_ptr<osg::Node> ammoNode = mAmmunition->getNode();
         osg::NodePathList nodepaths = ammoNode->getParentalNodePaths();

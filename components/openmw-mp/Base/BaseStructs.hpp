@@ -78,10 +78,15 @@ namespace mwmp
         std::string spellId; // id of spell (e.g. "fireball")
         std::string itemId;
 
+        std::string rangedWeaponId;
+        std::string rangedAmmoId;
+
         ESM::Position hitPosition;
 
         float damage;
+        float attackStrength;
 
+        bool isHit;
         bool success;
         bool block;
         
@@ -89,7 +94,7 @@ namespace mwmp
         bool instant;
         bool knockdown;
         bool applyWeaponEnchantment;
-        bool applyProjectileEnchantment;
+        bool applyAmmoEnchantment;
 
         bool shouldSend;
     };
