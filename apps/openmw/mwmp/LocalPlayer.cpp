@@ -46,6 +46,7 @@ using namespace std;
 LocalPlayer::LocalPlayer()
 {
     deathTime = time(0);
+    receivedCharacter = false;
 
     charGenState.currentStage = 0;
     charGenState.endStage = 1;
@@ -193,9 +194,12 @@ bool LocalPlayer::processCharGen()
     return true;
 }
 
-bool LocalPlayer::hasFinishedCharGen()
+bool LocalPlayer::isLoggedIn()
 {
-    return charGenState.isFinished;
+    if (charGenState.isFinished && (charGenState.endStage > 1 || receivedCharacter))
+        return true;
+
+    return false;
 }
 
 void LocalPlayer::updateStatsDynamic(bool forceUpdate)
@@ -221,16 +225,16 @@ void LocalPlayer::updateStatsDynamic(bool forceUpdate)
                                     || abs(oldVal.getCurrent() - newVal.getCurrent()) >= limit);
     };
 
-    if (needUpdate(oldHealth, health, 2))
+    if (forceUpdate || needUpdate(oldHealth, health, 2))
         statsDynamicIndexChanges.push_back(0);
 
-    if (needUpdate(oldMagicka, magicka, 4))
+    if (forceUpdate || needUpdate(oldMagicka, magicka, 4))
         statsDynamicIndexChanges.push_back(1);
 
-    if (needUpdate(oldFatigue, fatigue, 4))
+    if (forceUpdate || needUpdate(oldFatigue, fatigue, 4))
         statsDynamicIndexChanges.push_back(2);
 
-    if (statsDynamicIndexChanges.size() > 0 || forceUpdate)
+    if (forceUpdate || statsDynamicIndexChanges.size() > 0)
     {
         oldHealth = health;
         oldMagicka = magicka;
@@ -855,6 +859,8 @@ void LocalPlayer::closeInventoryWindows()
 
 void LocalPlayer::setCharacter()
 {
+    receivedCharacter = true;
+
     MWBase::World *world = MWBase::Environment::get().getWorld();
 
     // Ignore invalid races

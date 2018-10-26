@@ -28,7 +28,7 @@ namespace mwmp
 
             if (!isRequest())
             {
-                LOG_APPEND(Log::LOG_INFO, "- refId: %s, count: %i, charge: %f, enchantmentCharge: %f, soul: %s",
+                LOG_APPEND(Log::LOG_INFO, "- refId: %s, count: %i, charge: %i, enchantmentCharge: %f, soul: %s",
                     player->usedItem.refId.c_str(), player->usedItem.count, player->usedItem.charge,
                     player->usedItem.enchantmentCharge, player->usedItem.soul.c_str());
 
